@@ -1,7 +1,6 @@
 <?php
 
 $mysqli = new mysqli("localhost", "root", "123", "clientes");
-
 function autenticar(){
     if (isset($_SERVER['PHP_AUTH_USER'])&& isset($_SERVER["PHP_AUTH_PW"])){
         if ($_SERVER['PHP_AUTH_USER'] == "Admin" && $_SERVER["PHP_AUTH_PW"] == "1234"){return true;}
@@ -24,6 +23,22 @@ function buscarDni ($dni){
     else{return "Error de Autenticacion";}
 }
 
+function obtenerHeader($dni){
+    global $server;
+    $user = $dni;
+    $headers = $server->requestHeader;
+    /*$array = array();
+    array_push($array, $headers)*/
+    /*$pass = json_encode($headers)*/;
+    /*$pass = $h["datosUsuario"];*/
+    
+    /*$h = $server->();
+    /*$user = $h->usuario;*/
+    /*return "hola: $user - $pass --";*/
+    return json_encode($headers["Security"]["UsernameToken"]["Username"]);
+    
+}
+
 include './nusoap/lib/nusoap.php';
 
 $server = new soap_server();
@@ -31,6 +46,11 @@ $server->configureWSDL("WS de Prueba", "urn:WSP");
 
 $server->register(
         "buscarDni",
+        array("dni" => "xsd:int"),
+        array("return" => "xsd:string"));
+
+$server->register(
+        "obtenerHeader",
         array("dni" => "xsd:int"),
         array("return" => "xsd:string"));
 
